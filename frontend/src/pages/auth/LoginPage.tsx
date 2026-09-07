@@ -22,17 +22,38 @@ export const LoginPage: React.FC = () => {
       await login(email, password);
       navigate('/');
     } catch (err: any) {
-      setError(
-        err.response?.data?.message || 'E-mail ou senha inválidos. Verifique suas credenciais.',
-      );
+      if (!err.response) {
+        setError('Não foi possível conectar ao servidor. Verifique se o backend está acessível.');
+      } else {
+        setError(
+          err.response?.data?.message || 'E-mail ou senha inválidos. Verifique suas credenciais.',
+        );
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleQuickLogin = (demoEmail: string, demoPass: string) => {
+  const handleQuickLogin = async (demoEmail: string, demoPass: string) => {
     setEmail(demoEmail);
     setPassword(demoPass);
+    setError('');
+    setIsLoading(true);
+
+    try {
+      await login(demoEmail, demoPass);
+      navigate('/');
+    } catch (err: any) {
+      if (!err.response) {
+        setError('Não foi possível conectar ao servidor. Verifique se o backend está acessível.');
+      } else {
+        setError(
+          err.response?.data?.message || 'E-mail ou senha inválidos. Verifique suas credenciais.',
+        );
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -70,35 +91,60 @@ export const LoginPage: React.FC = () => {
           </button>
 
           {demoOpen && (
-            <div className="p-3 pt-0 grid grid-cols-2 gap-1.5 animate-in fade-in">
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('cidadao@apponte.com', 'cidadao123')}
-                className="px-2.5 py-2 rounded-xl bg-white dark:bg-slate-900 text-left text-[11px] font-bold text-slate-700 dark:text-slate-200 hover:bg-emerald-50 border border-slate-200/60 dark:border-slate-700"
-              >
-                👥 Cidadão
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('operador.obras@novaesperanca.gov.br', 'admin123')}
-                className="px-2.5 py-2 rounded-xl bg-white dark:bg-slate-900 text-left text-[11px] font-bold text-slate-700 dark:text-slate-200 hover:bg-emerald-50 border border-slate-200/60 dark:border-slate-700"
-              >
-                👷 Operador
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('secretario.obras@novaesperanca.gov.br', 'admin123')}
-                className="px-2.5 py-2 rounded-xl bg-white dark:bg-slate-900 text-left text-[11px] font-bold text-slate-700 dark:text-slate-200 hover:bg-emerald-50 border border-slate-200/60 dark:border-slate-700"
-              >
-                👔 Secretário
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('admin.novaesperanca@apponte.com', 'admin123')}
-                className="px-2.5 py-2 rounded-xl bg-white dark:bg-slate-900 text-left text-[11px] font-bold text-slate-700 dark:text-slate-200 hover:bg-emerald-50 border border-slate-200/60 dark:border-slate-700"
-              >
-                🏛️ Gestor Cidade
-              </button>
+            <div className="p-3 pt-0 space-y-2 animate-in fade-in">
+              <div className="text-[10px] font-extrabold uppercase text-emerald-800 dark:text-emerald-400 tracking-wider">
+                📍 Prefeitura de Guaratinguetá - SP
+              </div>
+              <div className="grid grid-cols-2 gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => handleQuickLogin('admin.guara@guaratingueta.sp.gov.br', 'admin123')}
+                  className="px-2.5 py-2 rounded-xl bg-white dark:bg-slate-900 text-left text-[11px] font-bold text-slate-700 dark:text-slate-200 hover:bg-emerald-50 border border-slate-200/60 dark:border-slate-700"
+                >
+                  🏛️ Gestor Guará
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickLogin('secretario.obras@guaratingueta.sp.gov.br', 'admin123')}
+                  className="px-2.5 py-2 rounded-xl bg-white dark:bg-slate-900 text-left text-[11px] font-bold text-slate-700 dark:text-slate-200 hover:bg-emerald-50 border border-slate-200/60 dark:border-slate-700"
+                >
+                  👔 Secretário Guará
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickLogin('operador.obras@guaratingueta.sp.gov.br', 'admin123')}
+                  className="px-2.5 py-2 rounded-xl bg-white dark:bg-slate-900 text-left text-[11px] font-bold text-slate-700 dark:text-slate-200 hover:bg-emerald-50 border border-slate-200/60 dark:border-slate-700"
+                >
+                  👷 Operador Guará
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickLogin('cidadao.guara@apponte.com', 'cidadao123')}
+                  className="px-2.5 py-2 rounded-xl bg-white dark:bg-slate-900 text-left text-[11px] font-bold text-slate-700 dark:text-slate-200 hover:bg-emerald-50 border border-slate-200/60 dark:border-slate-700"
+                >
+                  👥 Cidadão Guará
+                </button>
+              </div>
+
+              <div className="text-[10px] font-extrabold uppercase text-slate-500 tracking-wider pt-1">
+                🌐 Outros Perfis & Super Admin PixelLab
+              </div>
+              <div className="grid grid-cols-2 gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => handleQuickLogin('superadmin@apponte.com', 'admin123')}
+                  className="px-2.5 py-2 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-left text-[11px] font-bold text-purple-800 dark:text-purple-300 hover:bg-purple-100 border border-purple-200/60 dark:border-purple-800"
+                >
+                  👑 Super Admin PixelLab
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickLogin('cidadao@apponte.com', 'cidadao123')}
+                  className="px-2.5 py-2 rounded-xl bg-white dark:bg-slate-900 text-left text-[11px] font-bold text-slate-700 dark:text-slate-200 hover:bg-emerald-50 border border-slate-200/60 dark:border-slate-700"
+                >
+                  👥 Cidadão Geral
+                </button>
+              </div>
             </div>
           )}
         </div>

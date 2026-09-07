@@ -84,7 +84,7 @@ async function runSeed() {
   const adminPasswordHash = await bcrypt.hash('admin123', salt);
   const citizenPasswordHash = await bcrypt.hash('cidadao123', salt);
 
-  console.log('📦 1. Criando Planos SaaS...');
+  console.log('📦 1. Criando Modelos de Planos SaaS (PixelLab GovTech)...');
   const planFreeId = new Types.ObjectId();
   const planProId = new Types.ObjectId();
   const planEnterpriseId = new Types.ObjectId();
@@ -92,12 +92,18 @@ async function runSeed() {
   await db.collection('plans').insertMany([
     {
       _id: planFreeId,
-      name: 'Plano Gratuito',
+      name: 'Plano Gratuito / Cidadão Livre',
       slug: 'gratuito',
       tier: 'FREE',
       priceMonthly: 0,
       priceYearly: 0,
-      features: ['Acesso ao Feed e Mapa', 'Até 50 solicitações/mês', 'Exibição de anúncios', '1 Atuante'],
+      features: [
+        'Acesso Completo ao Feed Cívico e Mapa Urbano',
+        'Até 50 solicitações por mês',
+        'Exibição de anúncios de parceiros locais',
+        '1 Atuante/Operador de campo',
+        'Suporte comunitário via PixelLab Docs',
+      ],
       limits: { maxRequestsPerMonth: 50, maxStorageMb: 500, customDomain: false, removeAds: false, advancedAnalytics: false, operatorsLimit: 1 },
       active: true,
       createdAt: new Date(),
@@ -105,12 +111,20 @@ async function runSeed() {
     },
     {
       _id: planProId,
-      name: 'Prefeitura Pro',
+      name: 'Prefeitura Pro / Município Conectado',
       slug: 'prefeitura-pro',
       tier: 'PRO',
       priceMonthly: 990,
       priceYearly: 9900,
-      features: ['Solicitações Ilimitadas', 'Sem anúncios externos', 'Até 15 Atuantes', 'Dashboard Analítico', 'Relatórios em PDF'],
+      features: [
+        'Solicitações Cidadãs Ilimitadas',
+        '100% Sem anúncios externos',
+        'Até 15 Atuantes e Secretarias',
+        'Dashboard Analítico com Indicadores de SLA',
+        'Exportação de Relatórios Gerenciais em PDF/Excel',
+        'Gestão de Prioridades e Notificações por E-mail',
+        'Suporte Técnico PixelLab com SLA em até 12h',
+      ],
       limits: { maxRequestsPerMonth: 5000, maxStorageMb: 20480, customDomain: true, removeAds: true, advancedAnalytics: true, operatorsLimit: 15 },
       active: true,
       createdAt: new Date(),
@@ -118,12 +132,20 @@ async function runSeed() {
     },
     {
       _id: planEnterpriseId,
-      name: 'Prefeitura Enterprise',
+      name: 'Prefeitura Enterprise / Gestão Inteligente',
       slug: 'prefeitura-enterprise',
       tier: 'ENTERPRISE',
       priceMonthly: 2490,
       priceYearly: 24900,
-      features: ['Tudo do Pro', 'Atuantes Ilimitados', 'API de Integração Governamental', 'SLA Garantido 99.9%', 'Suporte Dedicado 24/7'],
+      features: [
+        'Tudo incluso no Plano Pro',
+        'Atuantes e Secretarias Ilimitados',
+        'API REST Governamental para Integração com Sistemas Próprios',
+        'Domínio Customizado (ex: apponte.guaratingueta.sp.gov.br)',
+        'SLA Garantido de 99.9% com Alta Disponibilidade',
+        'Roteirização Inteligente de Equipes de Campo com IA',
+        'Consultoria e Suporte Dedicado 24/7 pela Equipe PixelLab',
+      ],
       limits: { maxRequestsPerMonth: 999999, maxStorageMb: 102400, customDomain: true, removeAds: true, advancedAnalytics: true, operatorsLimit: 100 },
       active: true,
       createdAt: new Date(),
@@ -132,10 +154,35 @@ async function runSeed() {
   ]);
 
   console.log('🏛️ 2. Criando Prefeituras (Tenants)...');
+  const tenantGuaratinguetaId = new Types.ObjectId();
   const tenantNovaEsperancaId = new Types.ObjectId();
   const tenantSaoBentoId = new Types.ObjectId();
 
   await db.collection('tenants').insertMany([
+    {
+      _id: tenantGuaratinguetaId,
+      name: 'Prefeitura Municipal da Estância Turística de Guaratinguetá',
+      slug: 'guaratingueta',
+      cnpj: '46.680.508/0001-40',
+      city: 'Guaratinguetá',
+      state: 'SP',
+      logoUrl: 'https://images.unsplash.com/photo-1577495508048-b635879837f1?w=150&auto=format&fit=crop&q=80',
+      bannerUrl: 'https://images.unsplash.com/photo-1477959858617-67f30bc75b82?w=1200&auto=format&fit=crop&q=80',
+      contactEmail: 'ouvidoria@guaratingueta.sp.gov.br',
+      contactPhone: '(12) 3128-2800',
+      domain: 'guaratingueta.apponte.com.br',
+      settings: {
+        primaryColor: '#0284c7',
+        accentColor: '#10b981',
+        autoAssignOperator: false,
+        allowPublicComments: true,
+        requireEvidenceOnResolution: true,
+      },
+      status: 'ACTIVE',
+      planId: planEnterpriseId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
     {
       _id: tenantNovaEsperancaId,
       name: 'Prefeitura Municipal de Nova Esperança',
@@ -187,12 +234,73 @@ async function runSeed() {
   ]);
 
   console.log('🏢 3. Criando Secretarias Municipais...');
+  // Secretarias Guaratinguetá
+  const deptGuaraObrasId = new Types.ObjectId();
+  const deptGuaraIluminacaoId = new Types.ObjectId();
+  const deptGuaraMeioAmbienteId = new Types.ObjectId();
+  const deptGuaraTransitoId = new Types.ObjectId();
+
+  // Secretarias Nova Esperança
   const deptObrasId = new Types.ObjectId();
   const deptIluminacaoId = new Types.ObjectId();
   const deptMeioAmbienteId = new Types.ObjectId();
   const deptTransitoId = new Types.ObjectId();
 
   await db.collection('departments').insertMany([
+    // Guaratinguetá
+    {
+      _id: deptGuaraObrasId,
+      tenantId: tenantGuaratinguetaId,
+      name: 'Secretaria Municipal de Obras e Serviços',
+      slug: 'obras-servicos-guara',
+      description: 'Responsável por pavimentação, conservação de vias, tapa-buracos, drenagem e pontes.',
+      icon: 'hammer',
+      contactEmail: 'obras@guaratingueta.sp.gov.br',
+      contactPhone: '(12) 3128-2810',
+      active: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      _id: deptGuaraIluminacaoId,
+      tenantId: tenantGuaratinguetaId,
+      name: 'Secretaria de Serviços Urbanos e Iluminação',
+      slug: 'iluminacao-urbana-guara',
+      description: 'Manutenção de lâmpadas de LED, postes, praças públicas e monumentos da Estância.',
+      icon: 'lightbulb',
+      contactEmail: 'iluminacao@guaratingueta.sp.gov.br',
+      contactPhone: '(12) 3128-2820',
+      active: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      _id: deptGuaraMeioAmbienteId,
+      tenantId: tenantGuaratinguetaId,
+      name: 'Secretaria de Meio Ambiente e Agricultura',
+      slug: 'meio-ambiente-guara',
+      description: 'Poda de árvores, conservação de parques, controle de descarte irregular e limpeza urbana.',
+      icon: 'trees',
+      contactEmail: 'meioambiente@guaratingueta.sp.gov.br',
+      contactPhone: '(12) 3128-2830',
+      active: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      _id: deptGuaraTransitoId,
+      tenantId: tenantGuaratinguetaId,
+      name: 'Secretaria de Mobilidade Urbana e Segurança',
+      slug: 'mobilidade-seguranca-guara',
+      description: 'Sinalização viária, semáforos, fiscalização de trânsito e ciclofaixas.',
+      icon: 'traffic-cone',
+      contactEmail: 'transito@guaratingueta.sp.gov.br',
+      contactPhone: '(12) 3128-2840',
+      active: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    // Nova Esperança
     {
       _id: deptObrasId,
       tenantId: tenantNovaEsperancaId,
@@ -248,12 +356,102 @@ async function runSeed() {
   ]);
 
   console.log('🏷️ 4. Criando Categorias de Serviços Públicos...');
+  // Categorias Guaratinguetá
+  const catGuaraBuracoId = new Types.ObjectId();
+  const catGuaraIluminacaoId = new Types.ObjectId();
+  const catGuaraPodaId = new Types.ObjectId();
+  const catGuaraSemaforoId = new Types.ObjectId();
+
+  // Categorias Nova Esperança
   const catBuracoId = new Types.ObjectId();
   const catIluminacaoId = new Types.ObjectId();
   const catPodaId = new Types.ObjectId();
   const catSemaforoId = new Types.ObjectId();
 
   await db.collection('requestcategories').insertMany([
+    // Guaratinguetá
+    {
+      _id: catGuaraBuracoId,
+      tenantId: tenantGuaratinguetaId,
+      departmentId: deptGuaraObrasId,
+      name: 'Vias Públicas e Asfalto',
+      slug: 'vias-publicas-asfalto-guara',
+      description: 'Buracos, calçadas danificadas, desnível de asfalto e bueiros entupidos em Guaratinguetá.',
+      icon: 'wrench',
+      color: '#ef4444',
+      defaultPriority: RequestPriority.HIGH,
+      slaHours: 72,
+      subcategories: [
+        { name: 'Buraco no Asfalto', slug: 'buraco-asfalto', active: true },
+        { name: 'Calçada Quebrada', slug: 'calcada-quebrada', active: true },
+        { name: 'Bueiro Entupido ou Sem Tampa', slug: 'bueiro-problema', active: true },
+        { name: 'Lombada Danificada', slug: 'lombada-danificada', active: true },
+      ],
+      active: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      _id: catGuaraIluminacaoId,
+      tenantId: tenantGuaratinguetaId,
+      departmentId: deptGuaraIluminacaoId,
+      name: 'Iluminação Pública',
+      slug: 'iluminacao-publica-guara',
+      description: 'Lâmpadas apagadas, postes danificados ou iluminação intermitente.',
+      icon: 'zap',
+      color: '#f59e0b',
+      defaultPriority: RequestPriority.MEDIUM,
+      slaHours: 48,
+      subcategories: [
+        { name: 'Lâmpada de Poste Queimada', slug: 'lampada-queimada', active: true },
+        { name: 'Lâmpada Acesa Durante o Dia', slug: 'lampada-acesa-dia', active: true },
+        { name: 'Poste Abalroado ou com Risco de Queda', slug: 'poste-risco', active: true },
+      ],
+      active: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      _id: catGuaraPodaId,
+      tenantId: tenantGuaratinguetaId,
+      departmentId: deptGuaraMeioAmbienteId,
+      name: 'Limpeza e Arborização',
+      slug: 'limpeza-arborizacao-guara',
+      description: 'Poda preventiva de árvores, descarte irregular de entulho e limpeza de praças.',
+      icon: 'trees',
+      color: '#10b981',
+      defaultPriority: RequestPriority.MEDIUM,
+      slaHours: 96,
+      subcategories: [
+        { name: 'Poda de Galhos em Risco', slug: 'poda-arvore', active: true },
+        { name: 'Descarte Irregular de Entulho', slug: 'descarte-entulho', active: true },
+        { name: 'Mato Alto em Terreno Público', slug: 'mato-alto', active: true },
+      ],
+      active: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      _id: catGuaraSemaforoId,
+      tenantId: tenantGuaratinguetaId,
+      departmentId: deptGuaraTransitoId,
+      name: 'Trânsito e Mobilidade',
+      slug: 'transito-mobilidade-guara',
+      description: 'Semáforos com defeito, placas caídas e pintura de faixas apagadas.',
+      icon: 'traffic-cone',
+      color: '#0284c7',
+      defaultPriority: RequestPriority.HIGH,
+      slaHours: 24,
+      subcategories: [
+        { name: 'Semáforo Desligado ou Intermitente', slug: 'semaforo-defeito', active: true },
+        { name: 'Placa de Trânsito Danificada', slug: 'placa-danificada', active: true },
+        { name: 'Pintura de Faixa de Pedestre Apagada', slug: 'faixa-pedestre-apagada', active: true },
+      ],
+      active: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    // Nova Esperança
     {
       _id: catBuracoId,
       tenantId: tenantNovaEsperancaId,
@@ -339,6 +537,14 @@ async function runSeed() {
 
   console.log('👤 5. Criando Usuários para todos os perfis RBAC...');
   const superAdminId = new Types.ObjectId();
+  
+  // Guaratinguetá Users
+  const adminGuaraId = new Types.ObjectId();
+  const secretarioGuaraId = new Types.ObjectId();
+  const operadorGuaraId = new Types.ObjectId();
+  const cidadaoGuaraId = new Types.ObjectId();
+
+  // Nova Esperança Users
   const adminNovaEsperancaId = new Types.ObjectId();
   const secretarioObrasId = new Types.ObjectId();
   const operadorObrasId = new Types.ObjectId();
@@ -348,19 +554,87 @@ async function runSeed() {
   await db.collection('users').insertMany([
     {
       _id: superAdminId,
-      name: 'Super Administrador',
+      name: 'PixelLab Admin (Super)',
       email: 'superadmin@apponte.com',
       passwordHash: adminPasswordHash,
       role: Role.SUPER_ADMIN,
-      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=SuperAdmin',
-      phone: '(11) 99999-0000',
-      bio: 'Administrador Geral da Plataforma APPonte',
+      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=PixelLabAdmin',
+      phone: '(12) 99999-0000',
+      bio: 'Administrador Master e Desenvolvedor SaaS da PixelLab',
       isEmailVerified: true,
       status: 'ACTIVE',
       refreshTokens: [],
       createdAt: new Date(),
       updatedAt: new Date(),
     },
+    // Guaratinguetá Users
+    {
+      _id: adminGuaraId,
+      name: 'Gestor Municipal (Guaratinguetá)',
+      email: 'admin.guara@guaratingueta.sp.gov.br',
+      passwordHash: adminPasswordHash,
+      role: Role.ADMIN,
+      tenantId: tenantGuaratinguetaId,
+      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=AdminGuara',
+      phone: '(12) 99123-4567',
+      bio: 'Gabinete do Prefeito e Secretaria de Governo de Guaratinguetá',
+      isEmailVerified: true,
+      status: 'ACTIVE',
+      refreshTokens: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      _id: secretarioGuaraId,
+      name: 'Dr. Carlos Eduardo (Secretário Obras Guará)',
+      email: 'secretario.obras@guaratingueta.sp.gov.br',
+      passwordHash: adminPasswordHash,
+      role: Role.SECRETARY,
+      tenantId: tenantGuaratinguetaId,
+      departmentId: deptGuaraObrasId,
+      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=CarlosSecretarioGuara',
+      phone: '(12) 99234-5678',
+      bio: 'Secretário Municipal de Obras e Serviços de Guaratinguetá',
+      isEmailVerified: true,
+      status: 'ACTIVE',
+      refreshTokens: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      _id: operadorGuaraId,
+      name: 'Tiago Atuante (Operador Guará)',
+      email: 'operador.obras@guaratingueta.sp.gov.br',
+      passwordHash: adminPasswordHash,
+      role: Role.OPERATOR,
+      tenantId: tenantGuaratinguetaId,
+      departmentId: deptGuaraObrasId,
+      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=TiagoOperadorGuara',
+      phone: '(12) 99345-6789',
+      bio: 'Encarregado de Campo e Manutenção Viária - Guaratinguetá',
+      isEmailVerified: true,
+      status: 'ACTIVE',
+      refreshTokens: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      _id: cidadaoGuaraId,
+      name: 'Lucas Ferreira (Cidadão Guará)',
+      email: 'cidadao.guara@apponte.com',
+      passwordHash: citizenPasswordHash,
+      role: Role.CITIZEN,
+      tenantId: tenantGuaratinguetaId,
+      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=LucasCidadaoGuara',
+      phone: '(12) 99456-7890',
+      bio: 'Morador do Bairro Pedregulho em Guaratinguetá. Ativo na melhoria da cidade.',
+      isEmailVerified: true,
+      status: 'ACTIVE',
+      refreshTokens: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    // Nova Esperança Users
     {
       _id: adminNovaEsperancaId,
       name: 'Gestor Municipal (Admin)',
@@ -447,17 +721,209 @@ async function runSeed() {
 
   // Atualiza secretaryUserId nas Secretarias
   await db.collection('departments').updateOne(
+    { _id: deptGuaraObrasId },
+    { $set: { secretaryUserId: secretarioGuaraId } },
+  );
+  await db.collection('departments').updateOne(
     { _id: deptObrasId },
     { $set: { secretaryUserId: secretarioObrasId } },
   );
 
   console.log('📌 6. Criando Solicitações Cidadãs com GeoJSON e Históricos...');
+  // Guaratinguetá Requests
+  const reqGuaraAsfaltoId = new Types.ObjectId();
+  const reqGuaraLuzId = new Types.ObjectId();
+  const reqGuaraArvoreId = new Types.ObjectId();
+  const reqGuaraSinalId = new Types.ObjectId();
+
+  // Nova Esperança Requests
   const reqBuracoId = new Types.ObjectId();
   const reqLuzId = new Types.ObjectId();
   const reqPodaId = new Types.ObjectId();
   const reqSemaforoId = new Types.ObjectId();
 
   await db.collection('requests').insertMany([
+    // === GUARATINGUETÁ ===
+    {
+      _id: reqGuaraAsfaltoId,
+      protocol: 'GUA-2026-00001',
+      tenantId: tenantGuaratinguetaId,
+      departmentId: deptGuaraObrasId,
+      categoryId: catGuaraBuracoId,
+      subcategoryId: 'buraco-asfalto',
+      authorId: cidadaoGuaraId,
+      assignedToUserId: operadorGuaraId,
+      title: 'Cratera na Av. Juscelino Kubitschek próximo ao trevo de acesso',
+      description: 'Buraco profundo na faixa da direita da Av. Juscelino Kubitschek de Oliveira no sentido Centro. Risco alto de estourar pneus e causar acidentes.',
+      status: RequestStatus.IN_PROGRESS,
+      priority: RequestPriority.URGENT,
+      location: {
+        type: 'Point',
+        coordinates: [-45.1950, -22.8180], // GeoJSON Guaratinguetá [lng, lat]
+      },
+      address: {
+        formattedAddress: 'Av. Juscelino Kubitschek de Oliveira, 1200 - Pedregulho, Guaratinguetá - SP',
+        street: 'Av. Juscelino Kubitschek de Oliveira',
+        number: '1200',
+        neighborhood: 'Pedregulho',
+        city: 'Guaratinguetá',
+        state: 'SP',
+        postalCode: '12515-000',
+        reference: 'Próximo ao supermercado e posto de combustível',
+      },
+      media: [
+        {
+          url: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=80',
+          type: 'IMAGE',
+          filename: 'buraco_guara_jk.jpg',
+          size: 145000,
+        },
+      ],
+      resolutionMedia: [],
+      resolutionNotes: '',
+      supportsCount: 38,
+      commentsCount: 6,
+      sharesCount: 14,
+      viewsCount: 420,
+      isDeleted: false,
+      createdAt: new Date(Date.now() - 86400000 * 2),
+      updatedAt: new Date(),
+    },
+    {
+      _id: reqGuaraLuzId,
+      protocol: 'GUA-2026-00002',
+      tenantId: tenantGuaratinguetaId,
+      departmentId: deptGuaraIluminacaoId,
+      categoryId: catGuaraIluminacaoId,
+      subcategoryId: 'lampada-queimada',
+      authorId: cidadaoGuaraId,
+      title: 'Luminárias de LED apagadas na Rua Dr. Martiniano',
+      description: 'Dois postes consecutivos com lâmpadas apagadas em frente ao comércio local, deixando o trecho escuro e perigoso para pedestres à noite.',
+      status: RequestStatus.RESOLVED,
+      priority: RequestPriority.HIGH,
+      location: {
+        type: 'Point',
+        coordinates: [-45.1920, -22.8150],
+      },
+      address: {
+        formattedAddress: 'Rua Dr. Martiniano, 350 - Centro, Guaratinguetá - SP',
+        street: 'Rua Dr. Martiniano',
+        number: '350',
+        neighborhood: 'Centro',
+        city: 'Guaratinguetá',
+        state: 'SP',
+        postalCode: '12500-000',
+        reference: 'Em frente à farmácia',
+      },
+      media: [
+        {
+          url: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80',
+          type: 'IMAGE',
+          filename: 'poste_guara_centro.jpg',
+          size: 98000,
+        },
+      ],
+      resolutionMedia: [
+        {
+          url: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800&auto=format&fit=crop&q=80',
+          type: 'IMAGE',
+          filename: 'luminaria_guara_trocada.jpg',
+        },
+      ],
+      resolutionNotes: 'Equipe da Secretaria de Serviços Urbanos realizou a substituição dos módulos de LED na data de ontem.',
+      resolvedAt: new Date(Date.now() - 3600000 * 6),
+      supportsCount: 45,
+      commentsCount: 3,
+      sharesCount: 9,
+      viewsCount: 512,
+      isDeleted: false,
+      createdAt: new Date(Date.now() - 86400000 * 4),
+      updatedAt: new Date(Date.now() - 3600000 * 6),
+    },
+    {
+      _id: reqGuaraArvoreId,
+      protocol: 'GUA-2026-00003',
+      tenantId: tenantGuaratinguetaId,
+      departmentId: deptGuaraMeioAmbienteId,
+      categoryId: catGuaraPodaId,
+      subcategoryId: 'poda-arvore',
+      authorId: cidadaoGuaraId,
+      title: 'Galho de árvore encostando na rede elétrica na Av. Presidente Vargas',
+      description: 'Árvore de grande porte na calçada com galhos pesados tocando a fiação de média tensão na Vila Paraíba.',
+      status: RequestStatus.PENDING,
+      priority: RequestPriority.HIGH,
+      location: {
+        type: 'Point',
+        coordinates: [-45.1880, -22.8120],
+      },
+      address: {
+        formattedAddress: 'Av. Presidente Vargas, 450 - Vila Paraíba, Guaratinguetá - SP',
+        street: 'Av. Presidente Vargas',
+        number: '450',
+        neighborhood: 'Vila Paraíba',
+        city: 'Guaratinguetá',
+        state: 'SP',
+        postalCode: '12515-100',
+      },
+      media: [
+        {
+          url: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&auto=format&fit=crop&q=80',
+          type: 'IMAGE',
+          filename: 'arvore_guara.jpg',
+          size: 112000,
+        },
+      ],
+      supportsCount: 17,
+      commentsCount: 2,
+      sharesCount: 5,
+      viewsCount: 180,
+      isDeleted: false,
+      createdAt: new Date(Date.now() - 86400000 * 1),
+      updatedAt: new Date(),
+    },
+    {
+      _id: reqGuaraSinalId,
+      protocol: 'GUA-2026-00004',
+      tenantId: tenantGuaratinguetaId,
+      departmentId: deptGuaraTransitoId,
+      categoryId: catGuaraSemaforoId,
+      subcategoryId: 'semaforo-defeito',
+      authorId: cidadaoGuaraId,
+      title: 'Semáforo intermitente no cruzamento próximo à Praça da Estação',
+      description: 'Semáforo em alerta amarelo intermitente travado no cruzamento, gerando confusão e congestionamento nos horários de pico.',
+      status: RequestStatus.IN_PROGRESS,
+      priority: RequestPriority.URGENT,
+      location: {
+        type: 'Point',
+        coordinates: [-45.1910, -22.8140],
+      },
+      address: {
+        formattedAddress: 'Praça Condessa de Frontin - Centro, Guaratinguetá - SP',
+        street: 'Praça Condessa de Frontin',
+        neighborhood: 'Centro',
+        city: 'Guaratinguetá',
+        state: 'SP',
+        postalCode: '12500-110',
+        reference: 'Próximo à antiga estação ferroviária',
+      },
+      media: [
+        {
+          url: 'https://images.unsplash.com/photo-1508873535684-277a3cbcc4e8?w=800&auto=format&fit=crop&q=80',
+          type: 'IMAGE',
+          filename: 'semaforo_guara.jpg',
+          size: 89000,
+        },
+      ],
+      supportsCount: 29,
+      commentsCount: 4,
+      sharesCount: 8,
+      viewsCount: 310,
+      isDeleted: false,
+      createdAt: new Date(Date.now() - 3600000 * 12),
+      updatedAt: new Date(),
+    },
+
+    // === NOVA ESPERANÇA ===
     {
       _id: reqBuracoId,
       protocol: 'APP-2026-00001',
@@ -473,7 +939,7 @@ async function runSeed() {
       priority: RequestPriority.URGENT,
       location: {
         type: 'Point',
-        coordinates: [-46.6558, -23.5615], // GeoJSON [lng, lat]
+        coordinates: [-46.6558, -23.5615],
       },
       address: {
         formattedAddress: 'Av. Brasil, 1420 - Centro, Nova Esperança - SP',
@@ -483,20 +949,22 @@ async function runSeed() {
         city: 'Nova Esperança',
         state: 'SP',
         postalCode: '14800-000',
-        reference: 'Em frente à Farmácia Popular',
+        reference: 'Em frente ao Banco do Brasil',
       },
       media: [
         {
           url: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=80',
           type: 'IMAGE',
-          filename: 'buraco_av_brasil.jpg',
+          filename: 'buraco_asfalto.jpg',
           size: 145000,
         },
       ],
+      resolutionMedia: [],
+      resolutionNotes: '',
       supportsCount: 14,
       commentsCount: 3,
       sharesCount: 5,
-      viewsCount: 128,
+      viewsCount: 120,
       isDeleted: false,
       createdAt: new Date(Date.now() - 86400000 * 2),
       updatedAt: new Date(),
@@ -600,101 +1068,101 @@ async function runSeed() {
       categoryId: catSemaforoId,
       subcategoryId: 'semaforo-defeito',
       authorId: cidadaMariaId,
-      title: 'Semáforo apagado no cruzamento da Av. São Paulo com Rua 7',
-      description: 'O cruzamento é muito movimentado com linha de ônibus. Trânsito confuso e pedestres sem conseguir atravessar.',
+      title: 'Semáforo desligado no cruzamento da Av. Paulista com Rua 7 de Setembro',
+      description: 'Semáforo totalmente apagado desde a manhã de hoje, gerando grande retenção no fluxo e risco de colisão.',
       status: RequestStatus.IN_REVIEW,
       priority: RequestPriority.URGENT,
       location: {
         type: 'Point',
-        coordinates: [-46.6520, -23.5645],
+        coordinates: [-46.6530, -23.5645],
       },
       address: {
-        formattedAddress: 'Av. São Paulo, 500 - Centro, Nova Esperança - SP',
-        street: 'Av. São Paulo',
+        formattedAddress: 'Av. Paulista, 500 - Centro, Nova Esperança - SP',
+        street: 'Av. Paulista',
         number: '500',
         neighborhood: 'Centro',
         city: 'Nova Esperança',
         state: 'SP',
         postalCode: '14800-000',
       },
-      media: [],
+      media: [
+        {
+          url: 'https://images.unsplash.com/photo-1508873535684-277a3cbcc4e8?w=800&auto=format&fit=crop&q=80',
+          type: 'IMAGE',
+          filename: 'semaforo_apagado.jpg',
+          size: 89000,
+        },
+      ],
       supportsCount: 31,
-      commentsCount: 4,
-      sharesCount: 12,
-      viewsCount: 310,
+      commentsCount: 5,
+      sharesCount: 11,
+      viewsCount: 380,
       isDeleted: false,
-      createdAt: new Date(Date.now() - 3600000 * 8),
+      createdAt: new Date(Date.now() - 3600000 * 5),
       updatedAt: new Date(),
     },
   ]);
 
-  console.log('📜 7. Criando Históricos de Status com Evidências...');
+  console.log('📜 7. Criando Histórico de Mudanças de Status...');
   await db.collection('requeststatushistories').insertMany([
     {
-      requestId: reqBuracoId,
-      tenantId: tenantNovaEsperancaId,
-      status: RequestStatus.PENDING,
-      changedById: cidadaoJoaoId,
-      comment: 'Solicitação registrada pelo cidadão no aplicativo.',
-      evidenceMedia: [],
-      createdAt: new Date(Date.now() - 86400000 * 2),
-      updatedAt: new Date(Date.now() - 86400000 * 2),
+      requestId: reqGuaraAsfaltoId,
+      tenantId: tenantGuaratinguetaId,
+      previousStatus: RequestStatus.PENDING,
+      newStatus: RequestStatus.IN_PROGRESS,
+      changedByUserId: secretarioGuaraId,
+      notes: 'Chamado recebido pela Secretaria de Obras e equipe destacada para a Av. JK.',
+      createdAt: new Date(Date.now() - 86400000),
     },
     {
       requestId: reqBuracoId,
       tenantId: tenantNovaEsperancaId,
-      status: RequestStatus.IN_REVIEW,
-      changedById: secretarioObrasId,
-      comment: 'Solicitação analisada e encaminhada para a equipe de pavimentação asfáltica.',
-      evidenceMedia: [],
-      createdAt: new Date(Date.now() - 86400000 * 1.5),
-      updatedAt: new Date(Date.now() - 86400000 * 1.5),
-    },
-    {
-      requestId: reqBuracoId,
-      tenantId: tenantNovaEsperancaId,
-      status: RequestStatus.IN_PROGRESS,
-      changedById: operadorObrasId,
-      comment: 'Equipe de campo no local realizando o isolamento e preparação da massa asfáltica.',
-      evidenceMedia: [],
-      createdAt: new Date(Date.now() - 86400000 * 0.5),
-      updatedAt: new Date(Date.now() - 86400000 * 0.5),
+      previousStatus: RequestStatus.PENDING,
+      newStatus: RequestStatus.IN_PROGRESS,
+      changedByUserId: secretarioObrasId,
+      notes: 'Demanda autorizada para execução emergencial pela equipe de tapa-buracos.',
+      createdAt: new Date(Date.now() - 86400000),
     },
     {
       requestId: reqLuzId,
       tenantId: tenantNovaEsperancaId,
-      status: RequestStatus.PENDING,
-      changedById: cidadaMariaId,
-      comment: 'Abertura de chamado de iluminação pública.',
-      evidenceMedia: [],
-      createdAt: new Date(Date.now() - 86400000 * 4),
-      updatedAt: new Date(Date.now() - 86400000 * 4),
-    },
-    {
-      requestId: reqLuzId,
-      tenantId: tenantNovaEsperancaId,
-      status: RequestStatus.RESOLVED,
-      changedById: operadorObrasId,
-      comment: 'Lâmpada substituída com sucesso por modelo LED.',
-      evidenceMedia: [
-        {
-          url: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800&auto=format&fit=crop&q=80',
-          type: 'IMAGE',
-          filename: 'reparo_concluido.jpg',
-        },
-      ],
+      previousStatus: RequestStatus.IN_PROGRESS,
+      newStatus: RequestStatus.RESOLVED,
+      changedByUserId: operadorObrasId,
+      notes: 'Luminária substituída e testada no período noturno.',
       createdAt: new Date(Date.now() - 3600000 * 4),
-      updatedAt: new Date(Date.now() - 3600000 * 4),
     },
   ]);
 
-  console.log('💬 8. Criando Comentários e Apoios...');
+  console.log('💬 8. Criando Comentários e Apoios Cívicos...');
   await db.collection('requestcomments').insertMany([
+    {
+      requestId: reqGuaraAsfaltoId,
+      tenantId: tenantGuaratinguetaId,
+      authorId: cidadaoGuaraId,
+      content: 'Passo todo dia por aqui para ir trabalhar. Realmente estava perigoso, parabéns pela agilidade!',
+      media: [],
+      isInternal: false,
+      isDeleted: false,
+      createdAt: new Date(Date.now() - 86400000),
+      updatedAt: new Date(Date.now() - 86400000),
+    },
+    {
+      requestId: reqGuaraAsfaltoId,
+      tenantId: tenantGuaratinguetaId,
+      authorId: operadorGuaraId,
+      content: 'Equipe em deslocamento com maquinário para fresagem e recapeamento asfáltico.',
+      media: [],
+      isInternal: false,
+      isDeleted: false,
+      createdAt: new Date(Date.now() - 3600000 * 3),
+      updatedAt: new Date(Date.now() - 3600000 * 3),
+    },
     {
       requestId: reqBuracoId,
       tenantId: tenantNovaEsperancaId,
       authorId: cidadaMariaId,
-      content: 'Passei por lá ontem e quase furei o pneu! Muito importante consertar rápido.',
+      content: 'Passei hoje de manhã e o buraco aumentou ainda mais por conta da chuva de ontem.',
       media: [],
       isInternal: false,
       isDeleted: false,
@@ -712,20 +1180,23 @@ async function runSeed() {
       createdAt: new Date(Date.now() - 3600000 * 2),
       updatedAt: new Date(Date.now() - 3600000 * 2),
     },
-    {
-      requestId: reqBuracoId,
-      tenantId: tenantNovaEsperancaId,
-      authorId: secretarioObrasId,
-      content: 'Nota interna: verificar se há vazamento da concessionária de água sob a via.',
-      media: [],
-      isInternal: true, // Apenas para staff
-      isDeleted: false,
-      createdAt: new Date(Date.now() - 3600000 * 3),
-      updatedAt: new Date(Date.now() - 3600000 * 3),
-    },
   ]);
 
   await db.collection('requestsupports').insertMany([
+    {
+      requestId: reqGuaraAsfaltoId,
+      userId: cidadaoGuaraId,
+      tenantId: tenantGuaratinguetaId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      requestId: reqGuaraLuzId,
+      userId: cidadaoGuaraId,
+      tenantId: tenantGuaratinguetaId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
     {
       requestId: reqBuracoId,
       userId: cidadaMariaId,
@@ -742,61 +1213,41 @@ async function runSeed() {
     },
   ]);
 
-  console.log('📢 9. Criando Anúncios Locais e Patrocinadores SaaS...');
+  console.log('📢 9. Criando Anúncios Locais e Patrocinadores SaaS (PixelLab)...');
   await db.collection('advertisements').insertMany([
     {
-      tenantId: tenantNovaEsperancaId,
-      advertiserName: 'Supermercado Bom Preço',
-      advertiserContact: 'comercial@bompreco.com.br',
-      title: 'Super Ofertas da Semana no Bom Preço!',
-      description: 'Hortifruti fresquinho todos os dias e até 30% de economia no seu carrinho.',
+      tenantId: tenantGuaratinguetaId,
+      advertiserName: 'Vale Sul Construtora & Materiais',
+      advertiserContact: 'comercial@valesulguara.com.br',
+      title: 'Materiais para Construção e Reforma em Guaratinguetá',
+      description: 'Entrega rápida em toda a Estância de Guaratinguetá e região do Vale do Paraíba.',
       mediaUrl: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&auto=format&fit=crop&q=80',
-      targetUrl: 'https://bompreco.com.br',
+      targetUrl: 'https://valesulguara.com.br',
       placement: AdPlacement.FEED,
-      targetCity: 'Nova Esperança',
+      targetCity: 'Guaratinguetá',
       targetState: 'SP',
       status: AdStatus.ACTIVE,
-      impressionsCount: 1420,
-      clicksCount: 88,
-      budget: 500,
+      impressionsCount: 2420,
+      clicksCount: 140,
+      budget: 800,
       startDate: new Date(Date.now() - 86400000 * 10),
       endDate: new Date(Date.now() + 86400000 * 30),
       createdAt: new Date(),
       updatedAt: new Date(),
     },
     {
-      tenantId: tenantNovaEsperancaId,
-      advertiserName: 'Auto Center Confiança',
-      advertiserContact: 'contato@autocenter.com.br',
-      title: 'Revisão Preventiva & Pneus em até 10x Sem Juros',
-      description: 'Alinhamento, balanceamento e suspensão com garantia total para você rodar seguro.',
-      mediaUrl: 'https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=800&auto=format&fit=crop&q=80',
-      targetUrl: 'https://autocenter.com.br',
-      placement: AdPlacement.SIDEBAR,
-      targetCity: 'Nova Esperança',
-      targetState: 'SP',
-      status: AdStatus.ACTIVE,
-      impressionsCount: 890,
-      clicksCount: 42,
-      budget: 350,
-      startDate: new Date(Date.now() - 86400000 * 5),
-      endDate: new Date(Date.now() + 86400000 * 25),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-    {
-      tenantId: null, // Global banner
-      advertiserName: 'Energia Solar Sustentável',
-      advertiserContact: 'vendas@energiasolar.com.br',
-      title: 'Reduza sua conta de energia em até 95%',
-      description: 'Instalação rápida com financiamento facilitado para residências e comércios da região.',
+      tenantId: null, // Global banner PixelLab
+      advertiserName: 'PixelLab GovTech Solutions',
+      advertiserContact: 'contato@pixellab.com.br',
+      title: 'Modernize a Gestão da sua Prefeitura com a PixelLab',
+      description: 'SaaS completo de Zeladoria Urbana, Ouvidoria Digital e Participação Cidadã em Tempo Real.',
       mediaUrl: 'https://images.unsplash.com/photo-1509391365360-2e959784a276?w=800&auto=format&fit=crop&q=80',
-      targetUrl: 'https://energiasolar.com.br',
+      targetUrl: 'https://pixellab.com.br',
       placement: AdPlacement.HOME_HERO,
       status: AdStatus.ACTIVE,
-      impressionsCount: 3100,
-      clicksCount: 195,
-      budget: 1200,
+      impressionsCount: 4500,
+      clicksCount: 380,
+      budget: 2000,
       startDate: new Date(Date.now() - 86400000 * 15),
       endDate: new Date(Date.now() + 86400000 * 45),
       createdAt: new Date(),
@@ -806,6 +1257,17 @@ async function runSeed() {
 
   console.log('🔔 10. Criando Notificações Iniciais...');
   await db.collection('notifications').insertMany([
+    {
+      userId: cidadaoGuaraId,
+      tenantId: tenantGuaratinguetaId,
+      title: 'Ocorrência em Guaratinguetá Atualizada',
+      message: 'Sua solicitação GUA-2026-00001 na Av. JK agora está: Em Obras.',
+      type: 'STATUS_CHANGE',
+      link: '/requests/GUA-2026-00001',
+      read: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
     {
       userId: cidadaoJoaoId,
       tenantId: tenantNovaEsperancaId,
@@ -817,29 +1279,19 @@ async function runSeed() {
       createdAt: new Date(),
       updatedAt: new Date(),
     },
-    {
-      userId: cidadaMariaId,
-      tenantId: tenantNovaEsperancaId,
-      title: 'Solicitação APP-2026-00002 Resolvida com Sucesso!',
-      message: 'A equipe municipal concluiu o reparo da iluminação pública.',
-      type: 'STATUS_CHANGE',
-      link: '/requests/APP-2026-00002',
-      read: true,
-      createdAt: new Date(Date.now() - 3600000 * 4),
-      updatedAt: new Date(),
-    },
   ]);
 
   console.log('\n======================================================');
-  console.log('🎉 SEED CONCLUÍDO COM SUCESSO!');
+  console.log('🎉 SEED CONCLUÍDO COM SUCESSO! (PIXELLAB GOVTECH)');
   console.log('======================================================');
   console.log('Credenciais de Acesso geradas:');
-  console.log('👑 Super Admin:  superadmin@apponte.com              | Senha: admin123');
-  console.log('🏛️ Admin Tenant: admin.novaesperanca@apponte.com     | Senha: admin123');
-  console.log('👔 Secretário:   secretario.obras@novaesperanca.gov.br| Senha: admin123');
-  console.log('👷 Atuante:      operador.obras@novaesperanca.gov.br  | Senha: admin123');
-  console.log('👥 Cidadão:      cidadao@apponte.com                 | Senha: cidadao123');
-  console.log('👥 Cidadã:       maria.cidada@apponte.com            | Senha: cidadao123');
+  console.log('👑 Super Admin:       superadmin@apponte.com              | Senha: admin123');
+  console.log('🏛️ Gestor Guará:      admin.guara@guaratingueta.sp.gov.br | Senha: admin123');
+  console.log('👔 Secretário Guará:  secretario.obras@guaratingueta.sp.gov.br| Senha: admin123');
+  console.log('👷 Atuante Guará:     operador.obras@guaratingueta.sp.gov.br| Senha: admin123');
+  console.log('👥 Cidadão Guará:     cidadao.guara@apponte.com           | Senha: cidadao123');
+  console.log('🏛️ Admin N.Esperança: admin.novaesperanca@apponte.com     | Senha: admin123');
+  console.log('👥 Cidadão Geral:     cidadao@apponte.com                 | Senha: cidadao123');
   console.log('======================================================\n');
 
   await mongoose.disconnect();

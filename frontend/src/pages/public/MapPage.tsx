@@ -15,6 +15,13 @@ import {
   Clock,
 } from 'lucide-react';
 
+// Known City Coordinates Map
+const CITY_CENTERS: Record<string, [number, number]> = {
+  guaratingueta: [-22.8163, -45.1925],
+  'nova-esperanca': [-23.5615, -46.6558],
+  'sao-bento': [-21.5000, -44.5000],
+};
+
 export const MapPage: React.FC = () => {
   const { activeTenant } = useTenant();
   const [requests, setRequests] = useState<RequestItem[]>([]);
@@ -24,8 +31,18 @@ export const MapPage: React.FC = () => {
   const [selectedRequest, setSelectedRequest] = useState<RequestItem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Default Center (São Paulo coordinates or selected tenant center)
-  const defaultCenter: [number, number] = [-23.5615, -46.6558];
+  // Dynamic Center based on active city
+  const getCityCoordinates = (): [number, number] => {
+    if (!activeTenant) return [-22.8163, -45.1925]; // Guaratinguetá padrão
+    const slug = (activeTenant.slug || '').toLowerCase();
+    if (CITY_CENTERS[slug]) return CITY_CENTERS[slug];
+    if (slug.includes('guara')) return [-22.8163, -45.1925];
+    if (slug.includes('nova-esperanca')) return [-23.5615, -46.6558];
+    if (slug.includes('sao-bento')) return [-21.5000, -44.5000];
+    return [-22.8163, -45.1925];
+  };
+
+  const currentCenter = getCityCoordinates();
 
   useEffect(() => {
     if (activeTenant?._id) {
@@ -56,6 +73,24 @@ export const MapPage: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-2 sm:py-6 space-y-3 relative">
       
+      {/* City Header & Subtitle */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+              Mapa Urbano
+            </h1>
+            <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 flex items-center gap-1">
+              <MapPin className="w-3 h-3 text-emerald-600" />
+              <span>{activeTenant ? `${activeTenant.city} - ${activeTenant.state}` : 'Todas as Cidades'}</span>
+            </span>
+          </div>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Visualize ocorrências cívicas e pontos de zeladoria em tempo real
+          </p>
+        </div>
+      </div>
+
       {/* Top Filter Bar */}
       <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-3 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between gap-2 overflow-x-auto scrollbar-none">
         
@@ -132,7 +167,7 @@ export const MapPage: React.FC = () => {
       <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200/80 dark:border-slate-800 shadow-sm h-[calc(100vh-180px)] sm:h-[620px]">
         <LeafletMap
           requests={requests}
-          center={defaultCenter}
+          center={currentCenter}
           zoom={14}
           height="100%"
           onMarkerClick={(req) => setSelectedRequest(req)}

@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { RequestItem, RequestStatus } from '../../types';
 import { StatusBadge } from '../common/StatusBadge';
+import { useTheme } from '../../context/ThemeContext';
 import { Link } from 'react-router-dom';
 import { ExternalLink, MapPin } from 'lucide-react';
 
@@ -15,22 +16,32 @@ interface LeafletMapProps {
   onMarkerClick?: (request: RequestItem) => void;
 }
 
-// Helper component to smoothly center map when coordinates change
+// Helper component to smoothly center and animate map when city/coordinates change
 const MapController: React.FC<{ center: [number, number]; zoom: number }> = ({ center, zoom }) => {
   const map = useMap();
   useEffect(() => {
-    map.setView(center, zoom, { animate: true });
+    map.flyTo(center, zoom, { duration: 1.2 });
   }, [center, zoom, map]);
   return null;
 };
 
 export const LeafletMap: React.FC<LeafletMapProps> = ({
   requests,
-  center = [-23.5615, -46.6558],
-  zoom = 13,
+  center = [-22.8163, -45.1925],
+  zoom = 14,
   height = '500px',
   onMarkerClick,
 }) => {
+  const { theme } = useTheme();
+
+  // High-performance modern map tiles (Voyager for Light, DarkMatter for Dark mode)
+  const tileUrl =
+    theme === 'dark'
+      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+      : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+
+  const tileAttribution =
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>';
   // Create custom marker icons based on status
   const getMarkerIcon = (status: RequestStatus, priority: string) => {
     const colors: Record<RequestStatus, string> = {
@@ -70,8 +81,9 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
         className="h-full w-full"
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          key={theme} // Forces tile re-render smoothly when theme switches
+          attribution={tileAttribution}
+          url={tileUrl}
         />
 
         <MapController center={center} zoom={zoom} />

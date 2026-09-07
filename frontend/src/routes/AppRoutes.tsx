@@ -14,6 +14,7 @@ import { CitizenDashboard } from '../pages/citizen/CitizenDashboard';
 import { OperatorDashboard } from '../pages/operator/OperatorDashboard';
 import { SecretaryDashboard } from '../pages/secretary/SecretaryDashboard';
 import { AdminDashboard } from '../pages/admin/AdminDashboard';
+import { OnboardingModal } from '../components/common/OnboardingModal';
 import { useAuth } from '../context/AuthContext';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRoles?: string[] }> = ({
@@ -109,6 +110,7 @@ export const AppRoutes: React.FC = () => {
       </main>
       <Footer />
       <MobileBottomNav />
+      <OnboardingModal />
     </div>
   );
 };

@@ -11,15 +11,24 @@ export const Footer: React.FC = () => {
           {/* Brand Info */}
           <div className="space-y-4 md:col-span-1">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center text-white">
+              <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20">
                 <Compass className="w-5 h-5" />
               </div>
-              <span className="text-xl font-extrabold text-white tracking-tight">APPonte</span>
+              <div className="flex flex-col">
+                <span className="text-xl font-extrabold text-white tracking-tight">APPonte</span>
+                <span className="text-[9px] font-bold text-emerald-400 tracking-wider uppercase -mt-1">
+                  by PixelLab
+                </span>
+              </div>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Plataforma cívica de participação comunitária e gestão municipal inteligente.
+              Plataforma GovTech de participação comunitária, zeladoria urbana e gestão municipal inteligente.
               Conectando cidadãos a soluções transparentes para a cidade.
             </p>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-[11px] text-slate-300">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Desenvolvido por <strong>PixelLab</strong></span>
+            </div>
           </div>
 
           {/* Navegação Cidadã */}
@@ -49,10 +58,16 @@ export const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* Para Prefeituras / SaaS */}
+          {/* Para Prefeituras / SaaS PixelLab */}
           <div>
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-3">Governo & SaaS</h4>
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-3">SaaS & Planos PixelLab</h4>
             <ul className="space-y-2 text-xs">
+              <li>
+                <a href="#planos" className="hover:text-emerald-400 transition-colors flex items-center gap-1">
+                  <span>Planos Free & Pagos</span>
+                  <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">Novo</span>
+                </a>
+              </li>
               <li>
                 <Link to="/login" className="hover:text-emerald-400 transition-colors">
                   Portal do Gestor Municipal
@@ -64,37 +79,41 @@ export const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <span className="text-slate-500">Planos de Assinatura Municipal</span>
+                <span className="text-slate-400">Integração Ouvidoria e SLA com IA</span>
               </li>
               <li>
-                <span className="text-slate-500">Integração Ouvidoria e SLA</span>
+                <span className="text-slate-400">Desenvolvido por PixelLab GovTech</span>
               </li>
             </ul>
           </div>
 
-          {/* Transparência & Segurança */}
+          {/* Transparência & Cidades */}
           <div>
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-3">Transparência</h4>
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-3">Cidades Conectadas</h4>
             <div className="space-y-2 text-xs text-slate-400">
               <div className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-emerald-400" />
-                <span>Dados Abertos & Auditoria</span>
+                <span className="text-base">🏛️</span>
+                <span>Guaratinguetá - SP</span>
               </div>
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-cyan-400" />
-                <span>Geolocalização Precisa</span>
+                <span className="text-base">🏛️</span>
+                <span>Nova Esperança - SP</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-base">🏛️</span>
+                <span>São Bento - MG</span>
               </div>
               <p className="pt-2 text-[11px] text-slate-500">
-                Respeito à LGPD e proteção da privacidade de dados do cidadão.
+                100% em conformidade com a LGPD e Lei de Acesso à Informação.
               </p>
             </div>
           </div>
         </div>
 
         <div className="pt-6 border-t border-slate-800 text-center flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
-          <p>© {new Date().getFullYear()} APPonte — Plataforma Cidadã & SaaS. Todos os direitos reservados.</p>
+          <p>© {new Date().getFullYear()} APPonte — Uma solução SaaS desenvolvida por <strong>PixelLab</strong>.</p>
           <p className="flex items-center gap-1">
-            Desenvolvido com <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" /> para transformar cidades.
+            Desenvolvido com <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" /> por <strong>PixelLab</strong> para transformar cidades.
           </p>
         </div>
       </div>

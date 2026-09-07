@@ -113,6 +113,31 @@ export const FeedPage: React.FC = () => {
         {/* Left Column (Feed) */}
         <div className="lg:col-span-2 space-y-4">
           
+          {/* Friendly Welcome & Community Mission Banner */}
+          <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-slate-50 dark:from-emerald-950/40 dark:via-slate-900 dark:to-slate-900 border border-emerald-200/70 dark:border-emerald-800/60 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center shrink-0">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white">
+                  O que é o Feed Cívico?
+                </h2>
+                <p className="text-[11px] text-slate-600 dark:text-slate-400">
+                  Acompanhe e apoie as melhorias que os moradores estão solicitando para a prefeitura.
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new Event('apponte_open_onboarding'))}
+              className="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-emerald-50 text-emerald-700 dark:text-emerald-300 text-[11px] font-bold border border-emerald-200/80 dark:border-slate-700 shadow-sm shrink-0 flex items-center gap-1"
+            >
+              <span>💡 Ver Guia</span>
+            </button>
+          </div>
+
           {/* Clean Filter Bar */}
           <div className="bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-2xl border border-slate-200/70 dark:border-slate-800 shadow-sm space-y-3">
             

@@ -13,6 +13,7 @@ import {
   Building,
   Check,
 } from 'lucide-react';
+import { ThemeToggle } from '../common/ThemeToggle';
 
 export const Navbar: React.FC = () => {
   const { user, isAuthenticated, logout, isOperator, isSecretary, isAdmin, isSuperAdmin } = useAuth();
@@ -62,8 +63,8 @@ export const Navbar: React.FC = () => {
                   <span className="text-lg sm:text-xl font-black tracking-tight bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
                     APPonte
                   </span>
-                  <span className="hidden sm:inline text-[9px] text-slate-400 font-bold -mt-1 tracking-wider uppercase">
-                    Voz Cidadã
+                  <span className="hidden sm:inline text-[9px] text-emerald-600 dark:text-emerald-400 font-bold -mt-1 tracking-wider uppercase">
+                    by PixelLab
                   </span>
                 </div>
               </Link>
@@ -155,10 +156,37 @@ export const Navbar: React.FC = () => {
               >
                 Mapa Urbano
               </Link>
+              <a
+                href="/#planos"
+                className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              >
+                Planos SaaS
+              </a>
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new Event('apponte_open_onboarding'))}
+                className="px-3 py-1.5 rounded-xl text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50/80 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200/60 dark:border-emerald-800 transition-colors flex items-center gap-1.5"
+              >
+                <span>💡 Como Funciona?</span>
+              </button>
             </nav>
 
             {/* Right Action & Profile Area */}
             <div className="flex items-center gap-2 sm:gap-3">
+              {/* Theme Toggle Button */}
+              <ThemeToggle />
+
+              {/* Mobile Guide Quick Button */}
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new Event('apponte_open_onboarding'))}
+                title="Como Funciona o APPonte"
+                className="lg:hidden px-2 py-1 rounded-xl text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 border border-emerald-200/60 dark:border-emerald-800 text-xs font-bold flex items-center gap-1"
+              >
+                <span>💡</span>
+                <span className="text-[10px]">Guia</span>
+              </button>
+
               {/* Desktop Create Request Button */}
               <Link
                 to="/new-request"

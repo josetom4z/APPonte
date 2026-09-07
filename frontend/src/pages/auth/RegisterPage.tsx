@@ -33,9 +33,13 @@ export const RegisterPage: React.FC = () => {
       });
       navigate('/');
     } catch (err: any) {
-      setError(
-        err.response?.data?.message || 'Falha no cadastro. Verifique as informações fornecidas.',
-      );
+      if (!err.response) {
+        setError('Não foi possível conectar ao servidor. Verifique se o backend está acessível.');
+      } else {
+        setError(
+          err.response?.data?.message || 'Falha no cadastro. Verifique as informações fornecidas.',
+        );
+      }
     } finally {
       setIsLoading(false);
     }

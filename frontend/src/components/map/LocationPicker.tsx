@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import { Navigation, MapPin } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
 
 interface LocationPickerProps {
   initialLat?: number;
@@ -40,13 +41,22 @@ const MapEventsHandler: React.FC<{
 };
 
 export const LocationPicker: React.FC<LocationPickerProps> = ({
-  initialLat = -23.5615,
-  initialLng = -46.6558,
+  initialLat = -22.8163,
+  initialLng = -45.1925,
   onLocationSelect,
 }) => {
+  const { theme } = useTheme();
   const [position, setPosition] = useState<[number, number]>([initialLat, initialLng]);
   const [addressLoading, setAddressLoading] = useState(false);
   const [addressPreview, setAddressPreview] = useState<string>('');
+
+  const tileUrl =
+    theme === 'dark'
+      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+      : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+
+  const tileAttribution =
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>';
 
   const fetchAddressFromCoords = async (lat: number, lng: number) => {
     setAddressLoading(true);
@@ -135,8 +145,9 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
           className="h-full w-full"
         >
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            key={theme}
+            attribution={tileAttribution}
+            url={tileUrl}
           />
           <MapEventsHandler onSelect={handleSelect} />
           <Marker position={position} icon={pinIcon} />
