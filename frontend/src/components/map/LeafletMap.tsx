@@ -1,11 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { RequestItem, RequestStatus } from '../../types';
 import { StatusBadge } from '../common/StatusBadge';
-import { useTheme } from '../../context/ThemeContext';
 import { Link } from 'react-router-dom';
-import { ExternalLink, MapPin } from 'lucide-react';
+import { ExternalLink, MapPin, Layers } from 'lucide-react';
 
 interface LeafletMapProps {
   requests: RequestItem[];
@@ -15,6 +14,8 @@ interface LeafletMapProps {
   selectedRequestId?: string;
   onMarkerClick?: (request: RequestItem) => void;
 }
+
+export type MapLayerType = 'google-roadmap' | 'google-hybrid' | 'google-terrain';
 
 // Helper component to smoothly center and animate map when city/coordinates change
 const MapController: React.FC<{ center: [number, number]; zoom: number }> = ({ center, zoom }) => {
@@ -32,16 +33,39 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
   height = '500px',
   onMarkerClick,
 }) => {
-  const { theme } = useTheme();
+  const [activeLayer, setActiveLayer] = useState<MapLayerType>('google-roadmap');
+  const [showLayerMenu, setShowLayerMenu] = useState(false);
 
-  // High-performance modern map tiles (Voyager for Light, DarkMatter for Dark mode)
-  const tileUrl =
-    theme === 'dark'
-      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-      : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+  // 100% Authentic Google Maps Tile Layers
+  const getTileConfig = () => {
+    switch (activeLayer) {
+      case 'google-hybrid':
+        return {
+          url: 'https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+          subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+          attribution: '&copy; Google Maps Satélite',
+          maxZoom: 20,
+        };
+      case 'google-terrain':
+        return {
+          url: 'https://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',
+          subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+          attribution: '&copy; Google Maps Relevo',
+          maxZoom: 20,
+        };
+      case 'google-roadmap':
+      default:
+        return {
+          url: 'https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+          subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+          attribution: '&copy; Google Maps',
+          maxZoom: 20,
+        };
+    }
+  };
 
-  const tileAttribution =
-    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>';
+  const tile = getTileConfig();
+
   // Create custom marker icons based on status
   const getMarkerIcon = (status: RequestStatus, priority: string) => {
     const colors: Record<RequestStatus, string> = {
@@ -59,21 +83,92 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
     return L.divIcon({
       className: 'custom-leaflet-marker',
       html: `
-        <div class="custom-map-pin ${isUrgent}" style="background: ${color}; width: 32px; height: 32px; border: 2.5px solid #ffffff;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <div class="custom-map-pin ${isUrgent}" style="background: ${color}; width: 34px; height: 34px; border: 2.5px solid #ffffff; box-shadow: 0 4px 14px rgba(0,0,0,0.35);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
             <circle cx="12" cy="10" r="3"/>
           </svg>
         </div>
       `,
-      iconSize: [32, 32],
-      iconAnchor: [16, 32],
-      popupAnchor: [0, -32],
+      iconSize: [34, 34],
+      iconAnchor: [17, 34],
+      popupAnchor: [0, -34],
     });
   };
 
   return (
     <div style={{ height }} className="w-full rounded-2xl overflow-hidden shadow-inner relative border border-slate-200 dark:border-slate-800">
+      
+      {/* Top Google Layer Switcher */}
+      <div className="absolute top-3 right-3 z-[1000] flex flex-col items-end">
+        <button
+          type="button"
+          onClick={() => setShowLayerMenu(!showLayerMenu)}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md text-slate-800 dark:text-slate-100 text-xs font-bold shadow-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+          title="Alternar camada do Google Maps"
+        >
+          <Layers className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+          <span>
+            {activeLayer === 'google-roadmap' && 'Google Ruas'}
+            {activeLayer === 'google-hybrid' && 'Google Satélite'}
+            {activeLayer === 'google-terrain' && 'Google Relevo'}
+          </span>
+        </button>
+
+        {showLayerMenu && (
+          <div className="mt-1.5 p-1.5 rounded-xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-xl border border-slate-200 dark:border-slate-700 flex flex-col gap-1 min-w-[150px] animate-in fade-in slide-in-from-top-2">
+            <button
+              type="button"
+              onClick={() => {
+                setActiveLayer('google-roadmap');
+                setShowLayerMenu(false);
+              }}
+              className={`px-2.5 py-1.5 rounded-lg text-left text-xs font-medium transition-colors ${
+                activeLayer === 'google-roadmap'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
+            >
+              🗺️ Google Ruas
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveLayer('google-hybrid');
+                setShowLayerMenu(false);
+              }}
+              className={`px-2.5 py-1.5 rounded-lg text-left text-xs font-medium transition-colors ${
+                activeLayer === 'google-hybrid'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
+            >
+              🛰️ Google Satélite
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveLayer('google-terrain');
+                setShowLayerMenu(false);
+              }}
+              className={`px-2.5 py-1.5 rounded-lg text-left text-xs font-medium transition-colors ${
+                activeLayer === 'google-terrain'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
+            >
+              🏔️ Google Relevo
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Google Maps Brand Badge */}
+      <div className="absolute bottom-2 left-2 z-[1000] bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm px-2.5 py-1 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 flex items-center gap-1.5 pointer-events-none">
+        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200">Google Maps</span>
+      </div>
+
       <MapContainer
         center={center}
         zoom={zoom}
@@ -81,9 +176,11 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
         className="h-full w-full"
       >
         <TileLayer
-          key={theme} // Forces tile re-render smoothly when theme switches
-          attribution={tileAttribution}
-          url={tileUrl}
+          key={activeLayer}
+          attribution={tile.attribution}
+          url={tile.url}
+          subdomains={tile.subdomains}
+          maxZoom={tile.maxZoom}
         />
 
         <MapController center={center} zoom={zoom} />

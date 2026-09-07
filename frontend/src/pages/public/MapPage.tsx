@@ -12,7 +12,8 @@ import {
   ThumbsUp,
   MessageSquare,
   X,
-  Clock,
+  Navigation,
+  Loader2,
 } from 'lucide-react';
 
 // Known City Coordinates Map
@@ -31,7 +32,7 @@ export const MapPage: React.FC = () => {
   const [selectedRequest, setSelectedRequest] = useState<RequestItem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Dynamic Center based on active city
+  // Dynamic Center based on active city or GPS
   const getCityCoordinates = (): [number, number] => {
     if (!activeTenant) return [-22.8163, -45.1925]; // Guaratinguetá padrão
     const slug = (activeTenant.slug || '').toLowerCase();
@@ -42,7 +43,13 @@ export const MapPage: React.FC = () => {
     return [-22.8163, -45.1925];
   };
 
-  const currentCenter = getCityCoordinates();
+  const [mapCenter, setMapCenter] = useState<[number, number]>(getCityCoordinates());
+  const [mapZoom, setMapZoom] = useState(14);
+  const [gpsLoading, setGpsLoading] = useState(false);
+
+  useEffect(() => {
+    setMapCenter(getCityCoordinates());
+  }, [activeTenant]);
 
   useEffect(() => {
     if (activeTenant?._id) {
@@ -70,8 +77,56 @@ export const MapPage: React.FC = () => {
     loadMapRequests();
   }, [activeTenant, status, categoryId]);
 
+  // GPS User Location Button Handler
+  const handleUserGps = () => {
+    setGpsLoading(true);
+
+    const fallbackIp = async () => {
+      try {
+        const res = await fetch('https://get.geojs.io/v1/ip/geo.json');
+        const data = await res.json();
+        if (data && data.latitude && data.longitude) {
+          setMapCenter([parseFloat(data.latitude), parseFloat(data.longitude)]);
+          setMapZoom(16);
+          setGpsLoading(false);
+          return;
+        }
+      } catch (e) {
+        console.warn('IP fallback failed:', e);
+      }
+      setGpsLoading(false);
+    };
+
+    if (typeof navigator !== 'undefined' && 'geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setMapCenter([pos.coords.latitude, pos.coords.longitude]);
+          setMapZoom(17);
+          setGpsLoading(false);
+        },
+        () => {
+          // Retry without high accuracy or fallback to IP
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              setMapCenter([pos.coords.latitude, pos.coords.longitude]);
+              setMapZoom(16);
+              setGpsLoading(false);
+            },
+            () => {
+              fallbackIp();
+            },
+            { enableHighAccuracy: false, timeout: 6000 },
+          );
+        },
+        { enableHighAccuracy: true, timeout: 7000, maximumAge: 30000 },
+      );
+    } else {
+      fallbackIp();
+    }
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-2 sm:py-6 space-y-3 relative">
+    <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-2 sm:py-6 space-y-3 relative w-full max-w-full overflow-x-hidden">
       
       {/* City Header & Subtitle */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
@@ -86,13 +141,33 @@ export const MapPage: React.FC = () => {
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-0.5">
-            Visualize ocorrências cívicas e pontos de zeladoria em tempo real
+            Visualize ocorrências cívicas e pontos de zeladoria no Google Maps em tempo real
           </p>
         </div>
+
+        {/* GPS Quick Button in Header */}
+        <button
+          type="button"
+          onClick={handleUserGps}
+          disabled={gpsLoading}
+          className="self-start sm:self-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-75 text-white font-bold text-xs shadow-sm transition-all active:scale-95"
+        >
+          {gpsLoading ? (
+            <>
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              <span>Localizando...</span>
+            </>
+          ) : (
+            <>
+              <Navigation className="w-3.5 h-3.5" />
+              <span>Meu GPS / Minha Região</span>
+            </>
+          )}
+        </button>
       </div>
 
       {/* Top Filter Bar */}
-      <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-3 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between gap-2 overflow-x-auto scrollbar-none">
+      <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-3 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between gap-2 overflow-x-auto scrollbar-none w-full max-w-full">
         
         {/* Status Pill Filters */}
         <div className="flex items-center gap-1.5 shrink-0">
@@ -167,8 +242,8 @@ export const MapPage: React.FC = () => {
       <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200/80 dark:border-slate-800 shadow-sm h-[calc(100vh-180px)] sm:h-[620px]">
         <LeafletMap
           requests={requests}
-          center={currentCenter}
-          zoom={14}
+          center={mapCenter}
+          zoom={mapZoom}
           height="100%"
           onMarkerClick={(req) => setSelectedRequest(req)}
         />

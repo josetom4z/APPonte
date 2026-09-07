@@ -49,28 +49,28 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 transition-all">
+      <header className="sticky top-0 z-40 w-full max-w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 transition-all">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16">
             
             {/* Left: Brand Logo */}
-            <div className="flex items-center gap-3 sm:gap-6">
-              <Link to="/" className="flex items-center gap-2 group">
+            <div className="flex items-center gap-2 sm:gap-6 min-w-0">
+              <Link to="/" className="flex items-center gap-2 group shrink-0">
                 <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform">
                   <Compass className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
-                <div className="flex flex-col">
+                <div className="hidden sm:flex flex-col">
                   <span className="text-lg sm:text-xl font-black tracking-tight bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
                     APPonte
                   </span>
-                  <span className="hidden sm:inline text-[9px] text-emerald-600 dark:text-emerald-400 font-bold -mt-1 tracking-wider uppercase">
+                  <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold -mt-1 tracking-wider uppercase">
                     by PixelLab
                   </span>
                 </div>
               </Link>
 
               {/* City Selector Pill (Desktop Dropdown & Mobile Bottom Sheet Trigger) */}
-              <div className="relative">
+              <div className="relative min-w-0">
                 {/* Desktop Trigger */}
                 <button
                   onClick={() => setCityDropdownOpen(!cityDropdownOpen)}
@@ -84,10 +84,10 @@ export const Navbar: React.FC = () => {
                 {/* Mobile Pill Trigger */}
                 <button
                   onClick={() => setCitySheetOpen(true)}
-                  className="md:hidden flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-xs font-bold border border-emerald-200/60 dark:border-emerald-800"
+                  className="md:hidden flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-[11px] font-bold border border-emerald-200/60 dark:border-emerald-800 shrink-0 max-w-[110px]"
                 >
                   <MapPin className="w-3 h-3 text-emerald-600 shrink-0" />
-                  <span className="truncate max-w-[100px]">{activeTenant?.city || 'Cidade'}</span>
+                  <span className="truncate">{activeTenant?.city || 'Cidade'}</span>
                   <ChevronDown className="w-3 h-3 opacity-60 shrink-0" />
                 </button>
 

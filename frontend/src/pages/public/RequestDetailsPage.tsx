@@ -6,6 +6,7 @@ import { StatusBadge, PriorityBadge } from '../../components/common/StatusBadge'
 import { CommentThread } from '../../components/feed/CommentThread';
 import { LeafletMap } from '../../components/map/LeafletMap';
 import { useAuth } from '../../context/AuthContext';
+import { shareContent } from '../../utils/shareUtils';
 import {
   ArrowLeft,
   Clock,
@@ -59,10 +60,12 @@ export const RequestDetailsPage: React.FC = () => {
   }, [id, isAuthenticated]);
 
   const handleToggleSupport = async () => {
-    if (!isAuthenticated || !request) {
+    if (!isAuthenticated) {
       window.location.href = '/login';
       return;
     }
+    if (!request) return;
+
     const nextSupported = !supported;
     setSupported(nextSupported);
     setSupportsCount((p) => (nextSupported ? p + 1 : Math.max(0, p - 1)));
@@ -77,19 +80,18 @@ export const RequestDetailsPage: React.FC = () => {
     }
   };
 
-  const handleShare = () => {
+  const handleShare = async () => {
     const url = window.location.href;
-    if (navigator.share) {
-      navigator.share({
-        title: `APPonte — Solicitação ${request?.protocol}`,
-        text: request?.title,
-        url,
-      });
-      return;
+    const result = await shareContent({
+      title: `APPonte — Solicitação ${request?.protocol || ''}`,
+      text: `${request?.title || 'Demanda Cidadã'} - Acompanhe no APPonte:`,
+      url,
+    });
+
+    if (result === 'copied' || result === 'shared') {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
     }
-    navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
   };
 
   if (isLoading) {

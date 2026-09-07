@@ -103,11 +103,16 @@ export const requestService = {
   },
 
   // File Upload
-  async uploadFile(file: File): Promise<{ url: string; filename: string; type: string }> {
+  async uploadFile(
+    file: File | Blob,
+    customFilename?: string,
+  ): Promise<{ url: string; filename: string; type: string }> {
     const formData = new FormData();
-    formData.append('file', file);
-    return api.post('/uploads/file', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    if (file instanceof File) {
+      formData.append('file', file);
+    } else {
+      formData.append('file', file, customFilename || `foto-${Date.now()}.jpg`);
+    }
+    return api.post('/uploads/file', formData);
   },
 };

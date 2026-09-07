@@ -4,6 +4,7 @@ import { RequestItem } from '../../types';
 import { StatusBadge, PriorityBadge } from '../common/StatusBadge';
 import { requestService } from '../../services/request.service';
 import { useAuth } from '../../context/AuthContext';
+import { shareContent } from '../../utils/shareUtils';
 import {
   ThumbsUp,
   MessageSquare,
@@ -36,6 +37,7 @@ export const RequestCard: React.FC<RequestCardProps> = ({
       window.location.href = '/login';
       return;
     }
+
     if (isSupporting) return;
 
     setIsSupporting(true);
@@ -59,22 +61,18 @@ export const RequestCard: React.FC<RequestCardProps> = ({
 
   const handleShare = async (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     const shareUrl = `${window.location.origin}/requests/${request.protocol || request._id}`;
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: `APPonte — Solicitação ${request.protocol}`,
-          text: request.title,
-          url: shareUrl,
-        });
-        return;
-      } catch (err) {
-        // Fallback to clipboard
-      }
+    const result = await shareContent({
+      title: `APPonte — Solicitação ${request.protocol || ''}`,
+      text: `${request.title} - Veja os detalhes no APPonte:`,
+      url: shareUrl,
+    });
+
+    if (result === 'copied' || result === 'shared') {
+      setCopiedShare(true);
+      setTimeout(() => setCopiedShare(false), 2500);
     }
-    navigator.clipboard.writeText(shareUrl);
-    setCopiedShare(true);
-    setTimeout(() => setCopiedShare(false), 2000);
   };
 
   const timeAgo = (dateStr: string) => {

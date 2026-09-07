@@ -21,6 +21,11 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     config.headers['x-tenant-id'] = activeTenantId;
   }
 
+  // Permitir que o navegador e Axios configurem o boundary correto para FormData
+  if (config.data instanceof FormData && config.headers) {
+    delete config.headers['Content-Type'];
+  }
+
   return config;
 });
 

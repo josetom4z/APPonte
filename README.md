@@ -72,8 +72,8 @@ O banco de dados de desenvolvimento vem pré-configurado com contas para todos o
 
 3. Acesse a aplicação:
    - **Frontend Web**: [http://localhost](http://localhost) (ou [http://localhost:5173](http://localhost:5173))
-   - **API REST**: [http://localhost/api](http://localhost/api) (ou [http://localhost:3000/api](http://localhost:3000/api))
-   - **Swagger OpenAPI**: [http://localhost:3000/api/docs](http://localhost:3000/api/docs)
+   - **API REST**: [http://localhost/api](http://localhost/api) (ou [http://localhost:3001/api](http://localhost:3001/api))
+   - **Swagger OpenAPI**: [http://localhost/api/docs](http://localhost/api/docs) (ou [http://localhost:3001/api/docs](http://localhost:3001/api/docs))
 
 ---
 

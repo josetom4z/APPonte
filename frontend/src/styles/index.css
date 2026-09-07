@@ -8,9 +8,43 @@
     --brand-accent: #06b6d4;
   }
 
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
     @apply bg-slate-50 text-slate-900 antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  #root {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  img,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
+    height: auto;
   }
 
   /* Custom Scrollbar */
@@ -41,7 +75,8 @@
 
 /* Leaflet Map Overrides */
 .leaflet-container {
-  width: 100%;
+  width: 100% !important;
+  max-width: 100% !important;
   height: 100%;
   font-family: inherit;
   z-index: 10;
@@ -49,11 +84,13 @@
 
 .leaflet-popup-content-wrapper {
   @apply rounded-xl shadow-xl border border-slate-100 p-0 overflow-hidden;
+  max-width: min(280px, calc(100vw - 32px)) !important;
 }
 
 .leaflet-popup-content {
   margin: 0 !important;
   line-height: inherit;
+  max-width: 100% !important;
 }
 
 .custom-map-pin {
