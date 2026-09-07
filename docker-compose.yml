@@ -1,0 +1,89 @@
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: apponte_mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-secretpassword}
+      MONGO_INITDB_DATABASE: ${MONGO_DB_NAME:-apponte}
+    ports:
+      - "27018:27017" # Porta 27018 no host para evitar conflito com outros containers
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - apponte_network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: apponte_backend
+    restart: unless-stopped
+    ports:
+      - "3001:3000" # Porta 3001 no host para evitar conflito com outros containers
+    environment:
+      PORT: 3000
+      NODE_ENV: development
+      MONGODB_URI: mongodb://${MONGO_ROOT_USER:-admin}:${MONGO_ROOT_PASSWORD:-secretpassword}@mongodb:27017/${MONGO_DB_NAME:-apponte}?authSource=admin
+      JWT_SECRET: ${JWT_SECRET:-apponte_super_jwt_secret_dev_key_2026}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-15m}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-apponte_super_refresh_jwt_dev_key_2026}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-7d}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://localhost,http://localhost:3001}
+      UPLOAD_DIR: ./uploads
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - backend_uploads:/app/uploads
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - apponte_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: apponte_frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:3001/api
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - apponte_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: apponte_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - apponte_network
+
+volumes:
+  mongo_data:
+    driver: local
+  backend_uploads:
+    driver: local
+
+networks:
+  apponte_network:
+    driver: bridge

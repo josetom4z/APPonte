@@ -1,0 +1,77 @@
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: apponte_mongodb_prod
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DB_NAME:-apponte}
+    volumes:
+      - mongo_data_prod:/data/db
+    networks:
+      - apponte_prod_network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: apponte_backend_prod
+    restart: always
+    environment:
+      PORT: 3000
+      NODE_ENV: production
+      MONGODB_URI: mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASSWORD}@mongodb:27017/${MONGO_DB_NAME:-apponte}?authSource=admin
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-15m}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-7d}
+      CORS_ORIGINS: ${CORS_ORIGINS}
+      UPLOAD_DIR: ./uploads
+    volumes:
+      - backend_uploads_prod:/app/uploads
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - apponte_prod_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: apponte_frontend_prod
+    restart: always
+    networks:
+      - apponte_prod_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: apponte_nginx_prod
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - apponte_prod_network
+
+volumes:
+  mongo_data_prod:
+    driver: local
+  backend_uploads_prod:
+    driver: local
+
+networks:
+  apponte_prod_network:
+    driver: bridge
