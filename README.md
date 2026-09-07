@@ -2,7 +2,9 @@
 
 <div align="center">
 
-![APPonte Banner](https://images.unsplash.com/photo-1477959858617-67f30bc75b82?w=1200&auto=format&fit=crop&q=80)
+<p align="center">
+  <img src="docs/assets/banner.svg" alt="APPonte — Plataforma de Participação Cidadã e Gestão Municipal" width="100%" />
+</p>
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg?logo=typescript)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18-61DAFB.svg?logo=react)](https://reactjs.org/)
@@ -11,7 +13,8 @@
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg?logo=docker)](https://www.docker.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Uma ponte digital moderna e transparente conectando cidadãos, secretarias municipais e comércios locais.**
+**Uma ponte digital moderna e transparente conectando cidadãos, secretarias municipais e gestão pública.**  
+*Desenvolvido por **PixelLab GovTech Solutions***
 
 [Demonstração](#-credenciais-de-demonstração-seed) • [Arquitetura](#-arquitetura-do-sistema) • [Como Executar](#-como-executar-o-projeto) • [Swagger API](#-documentação-da-api-swagger) • [Módulos](#-módulos-e-funcionalidades)
 
@@ -31,7 +34,7 @@ Para prefeituras e secretarias, a plataforma oferece painéis executivos com con
 
 | Camada | Tecnologias Utilizadas |
 | :--- | :--- |
-| **Front-end** | React 18, TypeScript, Vite, Tailwind CSS, React Router, TanStack Query, React Hook Form, Zod, Axios, Lucide React, Leaflet & React-Leaflet (OpenStreetMap), Vitest. |
+| **Front-end** | React 18, TypeScript, Vite, Tailwind CSS, Dark Mode, React Router, TanStack Query, React Hook Form, Zod, Axios, Lucide React, Leaflet & React-Leaflet (OpenStreetMap & CartoDB), Vitest. |
 | **Back-end** | Node.js, TypeScript, NestJS 10, MongoDB, Mongoose (Índices `2dsphere` GeoJSON), Passport JWT & Refresh Token, Swagger / OpenAPI, Multer, Class-Validator, Throttler, Helmet. |
 | **Infraestrutura** | Docker, Docker Compose, Nginx (Reverse Proxy & Load Balancer), Volumes Persistentes, Health Checks. |
 
@@ -41,14 +44,15 @@ Para prefeituras e secretarias, a plataforma oferece painéis executivos com con
 
 O banco de dados de desenvolvimento vem pré-configurado com contas para todos os perfis RBAC:
 
-| Perfil | E-mail de Acesso | Senha Padrão | Responsabilidades / Acessos |
-| :--- | :--- | :--- | :--- |
-| 👑 **Super Admin** | `superadmin@apponte.com` | `admin123` | Acesso global, gestão de prefeituras, planos SaaS e métricas. |
-| 🏛️ **Admin Tenant** | `admin.novaesperanca@apponte.com` | `admin123` | Gestão da prefeitura, secretarias, categorias e anúncios locais. |
-| 👔 **Secretário** | `secretario.obras@novaesperanca.gov.br` | `admin123` | Dashboard analítico da pasta, SLAs, indicadores e alocação de equipe. |
-| 👷 **Atuante (Operador)** | `operador.obras@novaesperanca.gov.br` | `admin123` | Fila de atendimento, alteração de status e envio de fotos comprobatórias. |
-| 👥 **Cidadão Ativo** | `cidadao@apponte.com` | `cidadao123` | Abertura de chamados com GPS, fotos, comentários e apoios. |
-| 👥 **Cidadã** | `maria.cidada@apponte.com` | `cidadao123` | Interação cívica comunitária no feed e mapa. |
+| Perfil | Município | E-mail de Acesso | Senha Padrão | Responsabilidades / Acessos |
+| :--- | :--- | :--- | :--- | :--- |
+| 👑 **Super Admin** | *Global (PixelLab)* | `superadmin@apponte.com` | `admin123` | Acesso global, gestão de prefeituras, planos SaaS e métricas. |
+| 🏛️ **Admin Tenant** | Guaratinguetá - SP | `admin.guaratingueta@apponte.com` | `admin123` | Gestão da prefeitura, secretarias, categorias e anúncios locais. |
+| 👔 **Secretário** | Guaratinguetá - SP | `secretario.obras@guaratingueta.sp.gov.br` | `admin123` | Dashboard analítico da pasta, SLAs, indicadores e alocação de equipe. |
+| 👷 **Atuante (Operador)** | Guaratinguetá - SP | `operador.obras@guaratingueta.sp.gov.br` | `admin123` | Fila de atendimento, alteração de status e fotos comprobatórias. |
+| 👥 **Cidadão Ativo** | Guaratinguetá - SP | `cidadao.guara@apponte.com` | `cidadao123` | Abertura de chamados com GPS, fotos, comentários e apoios. |
+| 🏛️ **Admin Tenant** | Nova Esperança - SP | `admin.novaesperanca@apponte.com` | `admin123` | Gestão da prefeitura modelo. |
+| 👥 **Cidadã** | Nova Esperança - SP | `maria.cidada@apponte.com` | `cidadao123` | Interação cívica comunitária no feed e mapa. |
 
 ---
 
